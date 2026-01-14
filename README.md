@@ -490,6 +490,44 @@ echo 'VITE_CONVEX_DEPLOYMENT_URL=http://127.0.0.1:3212' >> .env.local
 
 > **Why this happens**: `npx convex dev` creates `.env.local` with `VITE_CONVEX_URL`, but the React app is configured to use `VITE_CONVEX_DEPLOYMENT_URL`. Both variables should point to the same Convex backend URL.
 
+### 404 Error for /convex/_generated/api.js
+
+**Problem**: Browser console shows `net::ERR_ABORTED 404 (Not Found)` for `http://localhost:5174/convex/_generated/api.js`
+
+**Root Cause**: Vite proxy configuration is too broad, intercepting local file requests and forwarding them to the backend.
+
+**Solution**: Check your `vite.config.js` proxy configuration:
+
+```javascript
+// INCORRECT - Too broad!
+proxy: {
+  '/convex': {  // ← This catches ALL /convex paths
+    target: 'http://localhost:3210',
+    changeOrigin: true,
+    ws: true,
+  }
+}
+
+// CORRECT - Only proxy API calls
+proxy: {
+  '/convex/api': {  // ← Only proxy API endpoint
+    target: 'http://localhost:3210',
+    changeOrigin: true,
+    ws: true,
+    rewrite: (path) => path.replace(/^\/convex\/api/, '/api'),
+  }
+}
+```
+
+> **Why this happens**: The `convex/_generated/api.js` file is a **local file** that should be resolved by Vite's module resolution from the filesystem. The proxy should only forward API calls (`/convex/api/*`) to the Convex backend, not local module requests.
+
+**Verification**:
+```bash
+# After fixing and restarting, verify the file is accessible
+curl http://localhost:5174/convex/_generated/api.js
+# Should return 200 OK with JavaScript content
+```
+
 ---
 
 ## Monitoring and Debugging

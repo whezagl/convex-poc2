@@ -197,6 +197,85 @@ sequenceDiagram
 
 ---
 
+## Update #1: Vite Proxy Configuration Issue (January 15, 2026)
+
+### Additional Issue Discovered
+
+After fixing the environment variable issue, a **second issue** was discovered: `net::ERR_ABORTED 404 (Not Found)` when trying to load `/convex/_generated/api.js`.
+
+### Root Cause
+
+The Vite proxy configuration in `vite.config.js` was forwarding **all** `/convex` requests to the Convex backend at `http://localhost:3210`. This included the local `_generated` files which should have been served by Vite's module resolution from the filesystem.
+
+### What Was Wrong
+
+```javascript
+// BEFORE (Incorrect)
+proxy: {
+  '/convex': {  // ← Too broad! Captures ALL /convex paths
+    target: 'http://localhost:3210',
+    changeOrigin: true,
+    ws: true,
+  }
+}
+```
+
+**The problem:** When the browser tried to access the local file `convex/_generated/api.js`, the proxy intercepted the request and forwarded it to the backend, which doesn't serve these files.
+
+### The Fix
+
+Updated `vite.config.js` to only proxy API requests to the backend:
+
+```javascript
+// AFTER (Correct)
+proxy: {
+  '/convex/api': {  // ← Only proxy API calls
+    target: 'http://localhost:3210',
+    changeOrigin: true,
+    ws: true,
+    rewrite: (path) => path.replace(/^\/convex\/api/, '/api'),
+  }
+}
+```
+
+Also added path resolution alias for cleaner imports:
+
+```javascript
+resolve: {
+  alias: {
+    '@': path.resolve(__dirname, './src'),
+  },
+},
+```
+
+### Verification
+
+```bash
+# After restart, the file should be accessible
+curl http://localhost:5174/convex/_generated/api.js
+# Returns 200 OK with the file contents
+```
+
+### Lessons Learned (Update)
+
+| Issue | Prevention |
+|-------|------------|
+| Vite proxy too broad, catching local file requests | Be specific with proxy paths - only proxy what needs to go to backend |
+| Local `_generated` files being forwarded to backend | Understand that local files should be resolved by Vite's module resolution, not HTTP requests |
+
+**Updated Status:** ✅ FULLY RESOLVED
+
+---
+
+## Update History
+
+| Date | Update | Author |
+|------|--------|--------|
+| Jan 15, 2026 | Initial RCA - Environment variable issue | Claude Code Assistant |
+| Jan 15, 2026 | Update #1 - Vite proxy configuration issue | Claude Code Assistant |
+
+---
+
 **Report Generated:** January 15, 2026
 **Author:** Claude Code Assistant
-**Status:** ✅ RESOLVED
+**Status:** ✅ FULLY RESOLVED
