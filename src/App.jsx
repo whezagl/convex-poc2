@@ -1,17 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import ViewPage from './pages/ViewPage'
 import './App.css'
 
 // Placeholder page components (will be implemented in subsequent subtasks)
-function ViewPage() {
-  return (
-    <div className="page">
-      <h1>View Page</h1>
-      <p>This page will display real-time data from Convex.</p>
-      <p>Coming soon in subtask-6-1...</p>
-    </div>
-  )
-}
-
 function UpdatePage() {
   return (
     <div className="page">
