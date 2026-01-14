@@ -187,6 +187,28 @@ npm run seed-data
 
 This adds 5 sample records (Alpha, Beta, Gamma, Delta, Epsilon) to demonstrate real-time sync.
 
+### Step 4.5: Generate Convex Type Bindings
+
+```bash
+# Generate type-safe API bindings for React app
+npx convex codegen
+```
+
+This command:
+1. Reads your Convex schema and functions
+2. Generates TypeScript types in `convex/_generated/`
+3. Creates type-safe imports for your React app
+
+**Output:**
+```
+convex/_generated/
+├── api.ts         # Type-safe API exports
+├── dataModel.ts   # Database schema types
+└── server.ts      # Server-side types
+```
+
+> **Why is this needed?** Convex uses code generation to provide end-to-end type safety. When you import `api.functions.getMockData` in React, TypeScript knows exactly what data it returns.
+
 ### Step 5: Start the React Application
 
 ```bash
@@ -214,7 +236,10 @@ Open your browser to `http://localhost:5173`
 convex-poc2/
 ├── convex/                    # Convex backend code
 │   ├── schema.ts             # Database schema (data model)
-│   └── functions.ts          # Query and mutation functions
+│   ├── schema.test.ts        # Schema validation tests
+│   ├── functions.ts          # Query and mutation functions
+│   ├── functions.test.ts     # Function tests
+│   └── _generated/           # Auto-generated type bindings (run npx convex codegen)
 ├── scripts/                   # Utility and deployment scripts
 │   ├── deploy.py             # Docker Compose orchestration
 │   ├── generate_admin_key.sh # Admin key generation wrapper
@@ -222,11 +247,16 @@ convex-poc2/
 ├── src/
 │   ├── pages/                # React page components
 │   │   ├── ViewPage.jsx      # Read-only data display
-│   │   └── UpdatePage.jsx    # Data update form
+│   │   ├── ViewPage.test.jsx # ViewPage component tests
+│   │   ├── UpdatePage.jsx    # Data update form
+│   │   └── UpdatePage.test.jsx # UpdatePage component tests
+│   ├── test/                 # Test configuration
+│   │   └── setup.js          # Vitest setup file
 │   ├── App.jsx               # Main app with routing
 │   ├── main.jsx              # Entry point with ConvexProvider
 │   └── App.css               # Component styles
 ├── docker-compose.yml        # Convex backend configuration
+├── vitest.config.js          # Vitest test configuration
 ├── vite.config.js            # Vite build configuration
 ├── package.json              # Project dependencies and scripts
 ├── .env.example              # Environment variable template
@@ -244,6 +274,10 @@ convex-poc2/
 | `npm run deploy` | Start Convex backend in Docker |
 | `npm run generate-admin-key` | Generate Convex admin key |
 | `npm run seed-data` | Populate database with sample data |
+| `npm test` | Run tests in watch mode |
+| `npm run test:run` | Run tests once |
+| `npm run test:ui` | Run tests with UI interface |
+| `npm run test:coverage` | Generate test coverage report |
 
 ### Python Deploy Script Commands
 
