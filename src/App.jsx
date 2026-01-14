@@ -1,34 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+// Placeholder page components (will be implemented in subsequent subtasks)
+function ViewPage() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="page">
+      <h1>View Page</h1>
+      <p>This page will display real-time data from Convex.</p>
+      <p>Coming soon in subtask-6-1...</p>
+    </div>
+  )
+}
+
+function UpdatePage() {
+  return (
+    <div className="page">
+      <h1>Update Page</h1>
+      <p>This page will provide a form to update data in Convex.</p>
+      <p>Coming soon in subtask-7-1...</p>
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <nav className="navbar">
+          <h2>Convex POC - Real-time React App</h2>
+          <div className="nav-links">
+            <Link to="/view">View Data</Link>
+            <Link to="/update">Update Data</Link>
+          </div>
+        </nav>
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<ViewPage />} />
+            <Route path="/view" element={<ViewPage />} />
+            <Route path="/update" element={<UpdatePage />} />
+          </Routes>
+        </main>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </BrowserRouter>
   )
 }
 
