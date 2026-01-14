@@ -216,15 +216,15 @@ convex/_generated/
 npm run dev
 ```
 
-Open your browser to `http://localhost:5173`
+Open your browser to `http://localhost:5174`
 
 ---
 
 ## Testing Real-Time Sync
 
 1. **Open two browser windows** side by side
-2. **Window 1**: Navigate to `http://localhost:5173/view` (View Page)
-3. **Window 2**: Navigate to `http://localhost:5173/update` (Update Page)
+2. **Window 1**: Navigate to `http://localhost:5174/view` (View Page)
+3. **Window 2**: Navigate to `http://localhost:5174/update` (Update Page)
 4. **In Window 2**: Select a record and update its value
 5. **Watch Window 1**: Changes appear instantly without refresh!
 
@@ -269,7 +269,7 @@ convex-poc2/
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start React development server (port 5173) |
+| `npm run dev` | Start React development server (port 5174) |
 | `npm run build` | Build React app for production |
 | `npm run deploy` | Start Convex backend in Docker |
 | `npm run generate-admin-key` | Generate Convex admin key |
@@ -304,13 +304,15 @@ python scripts/deploy.py status
 Create a `.env` file (copy from `.env.example`):
 
 ```bash
-# React Frontend - Development Mode
+# React Frontend - Development Mode (REQUIRED)
 VITE_CONVEX_DEPLOYMENT_URL=http://localhost:3210
 
 # Convex Backend (for admin operations)
 CONVEX_ADMIN_KEY=<generated-from-script>
 CONVEX_DEPLOYMENT_URL=http://localhost:3210
 ```
+
+> **Important:** The React app specifically looks for `VITE_CONVEX_DEPLOYMENT_URL`. If you see connection errors, verify this exact variable name is set. Using `npx convex dev` will create a `.env.local` file with `VITE_CONVEX_URL` - you must rename it to `VITE_CONVEX_DEPLOYMENT_URL` for the React app to connect properly.
 
 ### Docker Services
 
@@ -375,7 +377,7 @@ Docker provides:
 ```mermaid
 flowchart LR
     Host[Host Machine]
-    React[React App<br/>npm run dev<br/>Port 5173]
+    React[React App<br/>npm run dev<br/>Port 5174]
     Docker[Docker Container<br/>Convex Backend<br/>Port 3210]
 
     Host --> React
@@ -395,7 +397,7 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph "Docker Network"
-        ReactContainer[React Container<br/>Port 5173]
+        ReactContainer[React Container<br/>Port 5174]
         ConvexContainer[Convex Container<br/>Port 3210]
     end
 
@@ -456,15 +458,37 @@ cat .env | grep CONVEX_ADMIN_KEY
 
 ### Port Already in Use
 
-**Problem**: Ports 3210, 5173, or 6791 already occupied
+**Problem**: Ports 3210, 5174, or 6791 already occupied
 
 **Solution**:
 ```bash
 # Check what's using the port
-lsof -i :3210  # or 5173 or 6791
+lsof -i :3210  # or 5174 or 6791
 
 # Stop the conflicting service or change ports in docker-compose.yml
 ```
+
+### App Shows No Data / Connection Errors
+
+**Problem**: App loads but displays empty data list or shows connection errors in browser console
+
+**Root Cause**: Missing or incorrect environment variable name
+
+**Solution**:
+```bash
+# 1. Check your .env or .env.local file
+cat .env.local | grep VITE_CONVEX
+
+# 2. Verify the exact variable name is VITE_CONVEX_DEPLOYMENT_URL
+# If you see VITE_CONVEX_URL instead, add the correct name:
+
+echo 'VITE_CONVEX_DEPLOYMENT_URL=http://127.0.0.1:3212' >> .env.local
+
+# 3. Restart the Vite dev server
+# Ctrl+C to stop, then: npm run dev
+```
+
+> **Why this happens**: `npx convex dev` creates `.env.local` with `VITE_CONVEX_URL`, but the React app is configured to use `VITE_CONVEX_DEPLOYMENT_URL`. Both variables should point to the same Convex backend URL.
 
 ---
 
