@@ -122,7 +122,7 @@ def deploy():
         print("\nNext steps:")
         print("  1. Generate admin key: npm run generate-admin-key")
         print("  2. Start React dev server: npm run dev")
-        print("  3. Open browser: http://localhost:5173")
+        print("  3. Open browser: http://localhost:5174")
 
     except subprocess.CalledProcessError as e:
         print(f"✗ Failed to start services.", file=sys.stderr)
