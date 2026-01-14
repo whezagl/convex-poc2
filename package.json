@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "deploy": "python scripts/deploy.py",
+    "generate-admin-key": "bash scripts/generate_admin_key.sh",
     "seed-data": "bash scripts/seed-data.sh"
   },
   "dependencies": {
