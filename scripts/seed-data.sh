@@ -122,7 +122,7 @@ EOF
 
 # Use npx convex import to seed the data
 # The import command reads from a JSON file and inserts into the specified table
-if ! npx convex import --url "$CONVEX_DEPLOYMENT_URL" --admin-key "$CONVEX_ADMIN_KEY" --table mockData "$SEED_FILE"; then
+if ! npx convex import --url "$CONVEX_DEPLOYMENT_URL" --admin-key "$CONVEX_ADMIN_KEY" --table mockData --format jsonArray --replace --yes "$SEED_FILE"; then
     echo ""
     echo -e "${RED}Error: Failed to seed data into Convex database${NC}"
     echo ""
